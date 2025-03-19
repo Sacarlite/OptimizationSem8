@@ -45,7 +45,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
         private int _n;
 
         [ObservableProperty]
-        private bool _extrType=true;
+        private bool _extrType = true;
 
         [ObservableProperty]
         private double _firstLowerBound;
@@ -63,7 +63,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
         private double _minDiff;
 
         [ObservableProperty]
-        private double _step = 0.1; 
+        private double _step = 0.1;
 
         [ObservableProperty]
         private int _precision = 1;
@@ -106,40 +106,40 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
             }
 
             if (FirstLowerBound > FirstUpperBound)
-                {
-                    errors.Add("Нижняя граница первой переменной должна быть меньше или равна верхней границе.");
-                }
+            {
+                errors.Add("Нижняя граница первой переменной должна быть меньше или равна верхней границе.");
+            }
 
-                if (SecondLowerBound > SecondUpperBound)
-                {
-                    errors.Add("Нижняя граница второй переменной должна быть меньше или равна верхней границе.");
-                }
+            if (SecondLowerBound > SecondUpperBound)
+            {
+                errors.Add("Нижняя граница второй переменной должна быть меньше или равна верхней границе.");
+            }
 
-                if (errors.Count > 0)
-                {
-                    throw new ValidationException(ErorrsCombinator.CombinateErorrs(errors));
-                }
-    
+            if (errors.Count > 0)
+            {
+                throw new ValidationException(ErorrsCombinator.CombinateErorrs(errors));
+            }
 
-                var task = new TaskVariant17(
-                    alpha: Alpha,
-                    beta: Betta,
-                    mu: Mu,
-                    delta: Delta,
-                    g: G,
-                    a: A,
-                    n: N,
-                    mindiff: MinDiff,
-                    firstLowerBound: FirstLowerBound,
-                    firstUpperBound: FirstUpperBound,
-                    secondLowerBound: SecondLowerBound,
-                    secondUpperBound: SecondUpperBound
-                );
 
-                return (task,ExtrType,Tau);
-            
+            var task = new TaskVariant17(
+                alpha: Alpha,
+                beta: Betta,
+                mu: Mu,
+                delta: Delta,
+                g: G,
+                a: A,
+                n: N,
+                mindiff: MinDiff,
+                firstLowerBound: FirstLowerBound,
+                firstUpperBound: FirstUpperBound,
+                secondLowerBound: SecondLowerBound,
+                secondUpperBound: SecondUpperBound
+            );
+
+            return (task, ExtrType, Tau);
+
         }
-       
+
 
     }
 }

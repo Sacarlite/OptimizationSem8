@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Models.DbModels;
+﻿using Models.DbModels;
 using OptimizationSem8.DbConnector;
 
 namespace OptimizationSem8.Service

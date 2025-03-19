@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Models.Interface;
 
 namespace Models
@@ -57,7 +56,7 @@ namespace Models
         /// <param name="secondUpperBound">Верхняя граница второй переменной</param>
         public TaskVariant17(double alpha = 1.0, double beta = 1.0, double mu = 1.0, double delta = 1.0,
             double g = 1.0, double a = 1.0, int n = 2, double firstLowerBound = -18, double firstUpperBound = 7.0,
-            double secondLowerBound = -8.0, double secondUpperBound = 8.0, double mindiff=2)
+            double secondLowerBound = -8.0, double secondUpperBound = 8.0, double mindiff = 2)
         {
             _alpha = alpha;
             _beta = beta;

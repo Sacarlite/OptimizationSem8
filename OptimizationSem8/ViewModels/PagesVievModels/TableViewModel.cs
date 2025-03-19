@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Models.Interface;
 using Models;
-using OptimizationSem8.ViewModels.PagesVievModels.PageModels;
-using DocumentFormat.OpenXml.Spreadsheet;
+using Models.Interface;
 
 namespace OptimizationSem8.ViewModels.PagesVievModels
 {
@@ -52,11 +47,11 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
             var (firstLower, secondLower) = _task.GetLowerBounds();
             var (firstUpper, secondUpper) = _task.GetUpperBounds();
             var tempMatrix = new List<ObservableCollection<string>>();
-            var firstRow = new ObservableCollection<string>() {"-" };
+            var firstRow = new ObservableCollection<string>() { "-" };
             for (double i = secondLower; i <= secondUpper; i += _step)
             {
 
-                firstRow.Add( 
+                firstRow.Add(
                     $"T2={Math.Round(i, _precision)}"
                     );
             }
@@ -75,15 +70,15 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
                     funcValue = Math.Round(funcValue, _precision);
                     if (_task.CheckSecondOrderConstraints(point))
                     {
-                        row.Add( 
-                            Convert.ToString( funcValue)
+                        row.Add(
+                            Convert.ToString(funcValue)
                         );
                     }
                     else
                     {
-                        row.Add( "-");
+                        row.Add("-");
                     }
-                    
+
                 }
                 tempMatrix.Add(row);
             }
@@ -95,7 +90,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
         {
             double totalRows = tempMatrix.Count;
             double processedRows = 0;
-            int batchSize = 2; 
+            int batchSize = 2;
 
             for (int i = 0; i < tempMatrix.Count; i += batchSize)
             {
@@ -117,5 +112,5 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
         }
     }
 
-    
+
 }

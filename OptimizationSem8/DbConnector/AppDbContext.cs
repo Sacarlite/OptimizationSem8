@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Models.DbModels;
 
 namespace OptimizationSem8.DbConnector
@@ -15,7 +9,7 @@ namespace OptimizationSem8.DbConnector
 
         public AppDbContext()
         {
-            Database.EnsureCreated(); 
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,7 +25,7 @@ namespace OptimizationSem8.DbConnector
                     Id = 1,
                     Username = "admin",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                    Role = Role.Admin 
+                    Role = Role.Admin
                 },
                 new User
                 {

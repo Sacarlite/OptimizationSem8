@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OptimizationSem8.Service
+﻿namespace OptimizationSem8.Service
 {
     public static class PathService
     {

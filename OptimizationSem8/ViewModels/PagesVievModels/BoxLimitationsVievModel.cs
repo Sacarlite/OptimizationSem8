@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using OptimizationSem8.ViewModels.PagesVievModels.Interface;
 
@@ -45,7 +40,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
                 throw new ValidationException("Невозможно получить значения из-за ошибок валидации");
             }
 
-            return ((IterationMode, ItterationCount), Epsilon,_precision);
+            return ((IterationMode, ItterationCount), Epsilon, _precision);
         }
         partial void OnEpsilonChanged(double value)
         {

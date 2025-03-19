@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows;
-using Models.DbModels;
+﻿using System.Windows;
 
 namespace OptimizationSem8.Views
 {

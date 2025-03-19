@@ -1,9 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Models.DbModels;
 using OptimizationSem8.Service;
 using OptimizationSem8.Views;
-using System.Windows;
 
 namespace OptimizationSem8.ViewModels
 {

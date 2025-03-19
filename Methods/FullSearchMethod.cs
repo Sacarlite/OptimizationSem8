@@ -1,7 +1,6 @@
-﻿using Models.Interface;
-using Models;
+﻿using Models;
+using Models.Interface;
 using NLog;
-using System.Reflection;
 
 public class FullSearchMethod : MethodModel
 {
@@ -26,7 +25,7 @@ public class FullSearchMethod : MethodModel
     /// <param name="maximize">Флаг для максимизации или минимизации.</param>
     /// <param name="precision">Погрешность округления (количество знаков после запятой).</param>
     /// <param name="iterations">Кортеж, содержащий флаг ограничения итераций и максимальное количество итераций.</param>
-    public FullSearchMethod((bool iterationMode, int iterationCount) iterations ,ITask task, double step = 0.1, bool maximize = false, int precision = 4)
+    public FullSearchMethod((bool iterationMode, int iterationCount) iterations, ITask task, double step = 0.1, bool maximize = false, int precision = 4)
     {
         this.task = task ?? throw new ArgumentNullException(nameof(task));
         this.step = step;

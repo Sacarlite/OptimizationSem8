@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Windows;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml;
-using OptimizationSem8.ViewModels.PagesVievModels.PageModels;
-using System.Windows;
-using Models.Interface;
-using DocumentFormat.OpenXml.Drawing;
-using System.IO;
 using Models;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using Models.Interface;
 
 namespace OptimizationSem8.Service
 {
@@ -296,7 +286,7 @@ namespace OptimizationSem8.Service
                 }
             });
         }
-        
+
     }
 
 }

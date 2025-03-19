@@ -31,6 +31,6 @@ namespace OptimizationSem8
                 throw;
             }
             return new LoginWindow(new LoginViewModel());
-          }
+        }
     }
 }

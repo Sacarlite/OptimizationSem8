@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Models;
 using Models.Interface;
 using OptimizationSem8.Views.Pages;
 
 namespace OptimizationSem8.ViewModels.PagesVievModels
 {
-    public partial class VisualizationViewModel: ObservableObject
+    public partial class VisualizationViewModel : ObservableObject
     {
         private readonly ITask task;
         private readonly double epsilon;
@@ -33,7 +28,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
             this.task = task;
             this.epsilon = limitations.epsilon;
             this.precision = limitations.precision;
-            this.TableViewModel = new(task,epsilon, precision);
+            this.TableViewModel = new(task, epsilon, precision);
             Chart2DPage = new _2DChart(this);
             Chart3DPage = new _3DChart(this);
             TablePage = new TablePage(TableViewModel);
@@ -41,7 +36,8 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
 
 
 
-        public (List<double> DataX, List<double> DataY, List<double> DataZ) ParseData() {
+        public (List<double> DataX, List<double> DataY, List<double> DataZ) ParseData()
+        {
             List<double> DataX = new();
             List<double> DataY = new();
             List<double> DataZ = new();
@@ -61,14 +57,15 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
                     funcValue = Math.Round(funcValue, precision);
                     // Округляем значение функции для согласованности с precision
                     funcValue = Math.Round(funcValue, precision);
-                    if (task.CheckSecondOrderConstraints(point)) {
-                    DataX.Add(first);
-                    DataY.Add(second);
-                    DataZ.Add(funcValue);
-                }
+                    if (task.CheckSecondOrderConstraints(point))
+                    {
+                        DataX.Add(first);
+                        DataY.Add(second);
+                        DataZ.Add(funcValue);
+                    }
                 }
             }
             return (DataX, DataY, DataZ);
-    } 
+        }
     }
 }

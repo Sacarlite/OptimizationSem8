@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Methods;
 using Models;
-using Models.Interface;
 using OptimizationSem8.Enums;
 using OptimizationSem8.Service;
 using OptimizationSem8.ViewModels.PagesVievModels;
@@ -22,7 +16,7 @@ namespace OptimizationSem8.ViewModels
     public partial class MainViewModel : ObservableObject
     {
         [ObservableProperty]
-        private Dictionary<string, Type> _formulas=new Dictionary <string, Type>
+        private Dictionary<string, Type> _formulas = new Dictionary<string, Type>
             {
                 { "S=\\alpha\\cdot G\\cdot ((T_2-\\beta\\cdot A)^2+(\\mu\\cdot e^{(T_1+T_2)})^N+\\Delta\\cdot(T_2-T_1))", typeof(TaskVariant17) }
             };
@@ -38,7 +32,7 @@ namespace OptimizationSem8.ViewModels
         private Type _selectedFormula;
 
         [ObservableProperty]
-        private Visibility fullScanVisibility=Visibility.Collapsed;
+        private Visibility fullScanVisibility = Visibility.Collapsed;
 
         [ObservableProperty]
         private Type _selectedMethod;
@@ -84,9 +78,9 @@ namespace OptimizationSem8.ViewModels
         [RelayCommand]
         void OpenAboutWindow()
         {
-                var aboutWindow = new AboutWindow(new AboutViewModel());
-                aboutWindow.Show();
-                aboutWindow.Closing += AboutWindowClosing;
+            var aboutWindow = new AboutWindow(new AboutViewModel());
+            aboutWindow.Show();
+            aboutWindow.Closing += AboutWindowClosing;
             Application.Current.Windows.OfType<MainWindow>().FirstOrDefault()?.Hide();
         }
 
@@ -101,18 +95,18 @@ namespace OptimizationSem8.ViewModels
                 mainWindow.Activate();
             }
         }
-        
+
         [RelayCommand]
         private async Task ExportResultsToExel()
         {
-            if (selectedTaskVievModel is Task17ViewModel task&& ExtraNum is not null)
+            if (selectedTaskVievModel is Task17ViewModel task && ExtraNum is not null)
             {
                 string filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*";
                 string filePath = FileProvider.GetFilePath(FileMode.Save, filter, $"Результаты_{DateTime.Now:yyyyMMdd_HHmmss}", "Сохранить параметры в Excel");
 
                 if (!string.IsNullOrEmpty(filePath))
                 {
-                    await ExcelExplorer.ExportResultsToExcelAsync(funcPoint:ExtraNum, task:task.GetTask().task, filePath:filePath);
+                    await ExcelExplorer.ExportResultsToExcelAsync(funcPoint: ExtraNum, task: task.GetTask().task, filePath: filePath);
                 }
             }
             else
@@ -156,7 +150,7 @@ namespace OptimizationSem8.ViewModels
             {
                 MessageBox.Show("Задание не было выбрано", "Ошибка сохранения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-           
+
         }
 
         [RelayCommand]
@@ -237,13 +231,13 @@ namespace OptimizationSem8.ViewModels
                     this.VisualizationViewModel = new VisualizationViewModel(optTask.task, limitations);
                     if (SelectedMethod == typeof(BoxComplexMethod))
                     {
-                        var boxComplexMethod = new BoxComplexMethod(limitations.Item1, optTask.task, optTask.extrType,epsilon: limitations.epsilon, precision: limitations.precision);
+                        var boxComplexMethod = new BoxComplexMethod(limitations.Item1, optTask.task, optTask.extrType, epsilon: limitations.epsilon, precision: limitations.precision);
                         ExtraNum = boxComplexMethod.Optimize();
                         ExtraNum.FuncNum *= optTask.tau;
                     }
                     else if (SelectedMethod == typeof(FullSearchMethod))
                     {
-                        var fullSearchMethod = new FullSearchMethod(limitations.Item1,optTask.task, maximize: optTask.extrType, step: limitations.epsilon, precision: limitations.precision);
+                        var fullSearchMethod = new FullSearchMethod(limitations.Item1, optTask.task, maximize: optTask.extrType, step: limitations.epsilon, precision: limitations.precision);
                         ExtraNum = fullSearchMethod.Optimize();
                         ExtraNum.FuncNum *= optTask.tau;
                     }
@@ -252,7 +246,8 @@ namespace OptimizationSem8.ViewModels
                 {
                     MessageBox.Show("Не выбрана формула для расчётов или метод оптимизации", "Ошибка расчётов", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show($"Произошла ошибка при расчёте оптимального значения функции:{ex.Message}", "Ошибка расчётов", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -270,20 +265,20 @@ namespace OptimizationSem8.ViewModels
         {
             FullScanVisibility = Visibility.Collapsed;
             if (typeof(BoxComplexMethod) == value)
-            {                
+            {
                 var limitationVievModel = new BoxLimitationsViewModel();
                 MethodLimitations = new BoxLimitationsPage(limitationVievModel);
                 selectedMethodLimitationVievModel = limitationVievModel;
             }
             else if (typeof(FullSearchMethod) == value)
             {
-                FullScanVisibility=Visibility.Visible;
+                FullScanVisibility = Visibility.Visible;
                 var limitationVievModel = new FullSearchLimitationsViewModel();
                 MethodLimitations = new FullSearchLimitationsPage(limitationVievModel);
                 selectedMethodLimitationVievModel = limitationVievModel;
             }
         }
-     
+
 
     }
 }

@@ -174,7 +174,7 @@ namespace OptimizationSem8.ViewModels
             var changePasswordWindow = new ChangePasswordWindow();
             if (changePasswordWindow.ShowDialog() == true)
             {
-                
+
 
                 // Обновляем пароль администратора
                 CurrentAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordWindow.NewPassword);

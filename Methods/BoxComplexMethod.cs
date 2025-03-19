@@ -1,7 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using Models;
 using Models.Interface;
-using Models;
 using NLog;
 
 namespace Methods
@@ -43,7 +41,7 @@ namespace Methods
             MethodName = "Комплексный метод Бокса";
         }
 
-      /// <summary>
+        /// <summary>
         /// Выполняет оптимизацию методом Бокса.
         /// </summary>
         /// <returns>Оптимальные параметры в виде объекта FuncPoint с округлением до заданной погрешности.</returns>

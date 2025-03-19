@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using OptimizationSem8.Enums;
 
 namespace OptimizationSem8.Service
 {
-    public static  class FileProvider
+    public static class FileProvider
     {
         /// <summary>
         /// Открывает диалоговое окно для выбора или сохранения файла.
@@ -37,7 +32,7 @@ namespace OptimizationSem8.Service
         /// <summary>
         /// Открывает диалоговое окно для выбора файла.
         /// </summary>
-        private static  string OpenFileDialog(string filter, string title)
+        private static string OpenFileDialog(string filter, string title)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -56,7 +51,7 @@ namespace OptimizationSem8.Service
         /// <summary>
         /// Открывает диалоговое окно для сохранения файла.
         /// </summary>
-        private static  string SaveFileDialog(string filter, string defaultFileName, string title)
+        private static string SaveFileDialog(string filter, string defaultFileName, string title)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -77,7 +72,7 @@ namespace OptimizationSem8.Service
         /// <summary>
         /// Извлекает расширение по умолчанию из фильтра.
         /// </summary>
-        private static  string GetDefaultExtension(string filter)
+        private static string GetDefaultExtension(string filter)
         {
             string[] parts = filter.Split('|');
             if (parts.Length > 1)
