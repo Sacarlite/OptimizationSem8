@@ -22,7 +22,7 @@ namespace OptimizationSem8.ViewModels.PagesVievModels
         [ObservableProperty]
         [NotifyDataErrorInfo]
         [Range(1, int.MaxValue, ErrorMessage = "Количество итераций должно быть больше 0")]
-        private int itterationCount = 1000;
+        private int itterationCount;
 
         private int _precision = 1;
 

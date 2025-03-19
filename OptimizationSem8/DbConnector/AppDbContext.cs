@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Microsoft.EntityFrameworkCore;
 using Models.DbModels;
 
@@ -14,24 +15,23 @@ namespace OptimizationSem8.DbConnector
 
         public AppDbContext()
         {
-            Database.EnsureCreated(); // Создаём базу данных, если её нет
+            Database.EnsureCreated(); 
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=app_users.db");
+            optionsBuilder.UseSqlite("Data Source=Users.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Начальные данные с ролями
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
                     Id = 1,
                     Username = "admin",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                    Role = Role.Admin // Админ
+                    Role = Role.Admin 
                 },
                 new User
                 {

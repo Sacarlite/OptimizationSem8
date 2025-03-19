@@ -57,7 +57,7 @@
                                         <TextBlock TextAlignment="Center"
                                                    VerticalAlignment="Center">
                                             <TextBlock.Text>
-                                                <Binding Path="FuncValue" />
+                                                <Binding Path="" />
                                             </TextBlock.Text>
                                         </TextBlock>
                                     </Border>

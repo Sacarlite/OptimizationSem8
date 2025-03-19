@@ -29,4 +29,15 @@
     <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Examples\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\About.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

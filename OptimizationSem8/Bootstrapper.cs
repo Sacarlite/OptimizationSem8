@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Models;
+using OptimizationSem8.DbConnector;
 using OptimizationSem8.ViewModels;
 using OptimizationSem8.Views;
 
@@ -17,10 +18,19 @@ namespace OptimizationSem8
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при инициализации NLog: {ex.Message}");
+                Console.WriteLine($"Ошибка при инициализации логирования: {ex.Message}");
                 throw;
             }
-           return new LoginWindow(new LoginViewModel());
+            try
+            {
+                DbInitializer.Initialize(new AppDbContext());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при инициализации базы данных: {ex.Message}");
+                throw;
+            }
+            return new LoginWindow(new LoginViewModel());
           }
     }
 }

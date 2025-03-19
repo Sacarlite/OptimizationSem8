@@ -35,7 +35,7 @@ namespace OptimizationSem8.ViewModels
                 }
                 else
                 {
-                    var adminWindow = new AdminWindow(new AdminViewModel());
+                    var adminWindow = new AdminWindow(new AdminViewModel(user));
                     adminWindow.IsWindowClosing += IsWindowClosing;
                     adminWindow.Show();
                 }

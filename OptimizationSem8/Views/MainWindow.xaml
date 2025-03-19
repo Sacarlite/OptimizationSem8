@@ -32,7 +32,7 @@
                         </MenuItem>
                         <MenuItem Header="Итоговые данные" >
                             <MenuItem Header="В Exel формат" Command="{Binding ExportResultsToExelCommand}"/>
-                            <MenuItem Header="В Txt формат" Command="{Binding  ExportResultsToTxt}"/>
+                            <MenuItem Header="В Txt формат" Command="{Binding  ExportResultsToTxtCommand}"/>
                         </MenuItem>
                     </MenuItem>
                 </MenuItem>
@@ -68,7 +68,7 @@
 
 
                 
-                <MenuItem Header="Справка" />
+                <MenuItem Header="Справка" Command="{Binding OpenAboutWindowCommand}"/>
             </Menu>
 
         </Grid>
@@ -134,6 +134,7 @@
                                     <Frame Content="{Binding VisualizationViewModel.Chart3DPage}" NavigationUIVisibility="Hidden"/>
                                 </TabItem>
                                 <TabItem
+                                    Visibility="{Binding FullScanVisibility}"
 Header="Таблица">
                                     <Frame Content="{Binding VisualizationViewModel.TablePage}" NavigationUIVisibility="Hidden"/>
 

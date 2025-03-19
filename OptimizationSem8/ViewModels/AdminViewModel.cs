@@ -13,21 +13,12 @@ namespace OptimizationSem8.ViewModels
 {
     /// <summary>
     /// ViewModel для окна администратора.
-    /// Предоставляет функциональность для управления пользователями: просмотр, сброс пароля, удаление и добавление.
+    /// Предоставляет функциональность для управления пользователями, методами, формулами и изменения пароля администратора.
     /// </summary>
     public partial class AdminViewModel : ObservableObject
     {
         private readonly AppDbContext _context;
-        /// <summary>
-        // Свойство для хранения списка формул
-        /// </summary>
-        [ObservableProperty]
-        private ObservableCollection<FormulaModel> _formulas;
-        /// <summary>
-        // Свойство для хранения списка методов
-        /// </summary>
-        [ObservableProperty]
-        private ObservableCollection<MethodModel> _methods;
+
         /// <summary>
         /// Список пользователей.
         /// </summary>
@@ -41,25 +32,34 @@ namespace OptimizationSem8.ViewModels
         private User _selectedUser;
 
         /// <summary>
-        /// Конструктор ViewModel.
-        /// Инициализирует контекст базы данных и загружает пользователей.
+        /// Текущий администратор (пользователь, который вошел в систему).
         /// </summary>
-        public AdminViewModel()
-        {
-            // Инициализация списка формул
-            Formulas = new ObservableCollection<FormulaModel>
-            {
-                new() { Formula = "S=\\alpha\\cdot G\\cdot ((T_2-\\beta\\cdot A)^2+(\\mu\\cdot e^{(T_1+T_2)})^N+\\Delta\\cdot(T_2-T_1))" }
-            };
-            // Инициализация списка формул
-            Methods = new ObservableCollection<MethodModel>
-            {
-                new BoxComplexMethod(),
-                new FullSearchMethod()
+        [ObservableProperty]
+        private User _currentAdmin;
 
-            };
+        /// <summary>
+        /// Список формул.
+        /// </summary>
+        [ObservableProperty]
+        private ObservableCollection<FormulaModel> _formulas;
+
+        /// <summary>
+        /// Список методов.
+        /// </summary>
+        [ObservableProperty]
+        private ObservableCollection<MethodModel> _methods;
+
+        /// <summary>
+        /// Конструктор ViewModel.
+        /// Инициализирует контекст базы данных, загружает пользователей, методы и формулы.
+        /// </summary>
+        public AdminViewModel(User currentAdmin)
+        {
             _context = new AppDbContext();
+            CurrentAdmin = currentAdmin; // Устанавливаем текущего администратора
             LoadUsers();
+            InitializeFormulas();
+            InitializeMethods();
         }
 
         /// <summary>
@@ -68,6 +68,29 @@ namespace OptimizationSem8.ViewModels
         private void LoadUsers()
         {
             Users = new ObservableCollection<User>(_context.Users.ToList());
+        }
+
+        /// <summary>
+        /// Инициализирует список формул.
+        /// </summary>
+        private void InitializeFormulas()
+        {
+            Formulas = new ObservableCollection<FormulaModel>
+            {
+                new() { Formula = "S=\\alpha\\cdot G\\cdot ((T_2-\\beta\\cdot A)^2+(\\mu\\cdot e^{(T_1+T_2)})^N+\\Delta\\cdot(T_2-T_1))" }
+            };
+        }
+
+        /// <summary>
+        /// Инициализирует список методов.
+        /// </summary>
+        private void InitializeMethods()
+        {
+            Methods = new ObservableCollection<MethodModel>
+            {
+                new BoxComplexMethod(),
+                new FullSearchMethod()
+            };
         }
 
         /// <summary>
@@ -93,12 +116,21 @@ namespace OptimizationSem8.ViewModels
 
         /// <summary>
         /// Команда для удаления выбранного пользователя.
+        /// Администратор не может удалить самого себя.
         /// </summary>
         [RelayCommand]
         private void DeleteUser()
         {
             if (SelectedUser != null)
             {
+                // Проверяем, не пытается ли администратор удалить самого себя
+                if (SelectedUser.Id == CurrentAdmin.Id)
+                {
+                    MessageBox.Show("Вы не можете удалить самого себя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Удаляем пользователя
                 _context.Users.Remove(SelectedUser);
                 _context.SaveChanges();
                 LoadUsers();
@@ -132,33 +164,59 @@ namespace OptimizationSem8.ViewModels
                 }
             }
         }
-        // Команда для добавления метода
+
+        /// <summary>
+        /// Команда для изменения пароля текущего администратора.
+        /// </summary>
+        [RelayCommand]
+        private void ChangePassword()
+        {
+            var changePasswordWindow = new ChangePasswordWindow();
+            if (changePasswordWindow.ShowDialog() == true)
+            {
+                
+
+                // Обновляем пароль администратора
+                CurrentAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordWindow.NewPassword);
+                _context.SaveChanges();
+                MessageBox.Show("Пароль успешно изменен.", "Изменение пароля", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        /// <summary>
+        /// Команда для добавления метода.
+        /// </summary>
         [RelayCommand]
         private void AddMethod()
         {
             MessageBox.Show("Функционал добавления метода будет реализован позже.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // Команда для удаления метода
+        /// <summary>
+        /// Команда для удаления метода.
+        /// </summary>
         [RelayCommand]
         private void DeleteMethod()
         {
             MessageBox.Show("Функционал удаления метода будет реализован позже.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // Команда для добавления функции
+        /// <summary>
+        /// Команда для добавления функции.
+        /// </summary>
         [RelayCommand]
         private void AddFunction()
         {
             MessageBox.Show("Функционал добавления функции будет реализован позже.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        // Команда для удаления функции
+        /// <summary>
+        /// Команда для удаления функции.
+        /// </summary>
         [RelayCommand]
         private void DeleteFunction()
         {
             MessageBox.Show("Функционал удаления функции будет реализован позже.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
     }
 }

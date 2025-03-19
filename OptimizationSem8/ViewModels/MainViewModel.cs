@@ -14,6 +14,7 @@ using OptimizationSem8.Enums;
 using OptimizationSem8.Service;
 using OptimizationSem8.ViewModels.PagesVievModels;
 using OptimizationSem8.ViewModels.PagesVievModels.Interface;
+using OptimizationSem8.Views;
 using OptimizationSem8.Views.Pages;
 
 namespace OptimizationSem8.ViewModels
@@ -35,6 +36,9 @@ namespace OptimizationSem8.ViewModels
 
         [ObservableProperty]
         private Type _selectedFormula;
+
+        [ObservableProperty]
+        private Visibility fullScanVisibility=Visibility.Collapsed;
 
         [ObservableProperty]
         private Type _selectedMethod;
@@ -76,6 +80,28 @@ namespace OptimizationSem8.ViewModels
                 MessageBox.Show("Задание не было выбрано", "Ошибка сохранения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        [RelayCommand]
+        void OpenAboutWindow()
+        {
+                var aboutWindow = new AboutWindow(new AboutViewModel());
+                aboutWindow.Show();
+                aboutWindow.Closing += AboutWindowClosing;
+            Application.Current.Windows.OfType<MainWindow>().FirstOrDefault()?.Hide();
+        }
+
+        private void AboutWindowClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+
+            if (mainWindow != null)
+            {
+                mainWindow.Show();
+
+                mainWindow.Activate();
+            }
+        }
+        
         [RelayCommand]
         private async Task ExportResultsToExel()
         {
@@ -99,8 +125,9 @@ namespace OptimizationSem8.ViewModels
         {
             if (selectedTaskVievModel is Task17ViewModel task && ExtraNum is not null)
             {
-                string filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*";
-                string filePath = FileProvider.GetFilePath(FileMode.Save, filter, $"Результаты_{DateTime.Now:yyyyMMdd_HHmmss}", "Сохранить параметры в Excel");
+
+                string filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+                string filePath = FileProvider.GetFilePath(FileMode.Save, filter, $"Parameters_{DateTime.Now:yyyyMMdd_HHmmss}", "Сохранить параметры в TXT");
 
                 if (!string.IsNullOrEmpty(filePath))
                 {
@@ -201,26 +228,33 @@ namespace OptimizationSem8.ViewModels
         [RelayCommand]
         void Calc()
         {
-            if (selectedTaskVievModel is Task17ViewModel task&& selectedMethodLimitationVievModel is not null)
+            try
             {
-                var optTask = task.GetTask();
-                var limitations = selectedMethodLimitationVievModel.GetLimitation();
-                this.VisualizationViewModel = new VisualizationViewModel(optTask.task, limitations);
-                if(SelectedMethod == typeof( BoxComplexMethod))
+                if (selectedTaskVievModel is Task17ViewModel task && selectedMethodLimitationVievModel is not null)
                 {
-                   var boxComplexMethod = new BoxComplexMethod(optTask.task, optTask.extrType, epsilon: limitations.epsilon,precision: limitations.precision);
-                    ExtraNum = boxComplexMethod.Optimize();
-                    ExtraNum.FuncNum*= optTask.tau;
+                    var optTask = task.GetTask();
+                    var limitations = selectedMethodLimitationVievModel.GetLimitation();
+                    this.VisualizationViewModel = new VisualizationViewModel(optTask.task, limitations);
+                    if (SelectedMethod == typeof(BoxComplexMethod))
+                    {
+                        var boxComplexMethod = new BoxComplexMethod(limitations.Item1, optTask.task, optTask.extrType,epsilon: limitations.epsilon, precision: limitations.precision);
+                        ExtraNum = boxComplexMethod.Optimize();
+                        ExtraNum.FuncNum *= optTask.tau;
+                    }
+                    else if (SelectedMethod == typeof(FullSearchMethod))
+                    {
+                        var fullSearchMethod = new FullSearchMethod(limitations.Item1,optTask.task, maximize: optTask.extrType, step: limitations.epsilon, precision: limitations.precision);
+                        ExtraNum = fullSearchMethod.Optimize();
+                        ExtraNum.FuncNum *= optTask.tau;
+                    }
                 }
-                else if(SelectedMethod == typeof(FullSearchMethod))
+                else
                 {
-                    var fullSearchMethod = new FullSearchMethod(optTask.task, maximize: optTask.extrType, step: limitations.epsilon, precision: limitations.precision);
-                    ExtraNum = fullSearchMethod.Optimize();
-                    ExtraNum.FuncNum *= optTask.tau;
+                    MessageBox.Show("Не выбрана формула для расчётов или метод оптимизации", "Ошибка расчётов", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            else {
-                MessageBox.Show("Не выбрана формула для расчётов или метод оптимизации", "Ошибка расчётов", MessageBoxButton.OK, MessageBoxImage.Error);
+            }catch(Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка при расчёте оптимального значения функции:{ex.Message}", "Ошибка расчётов", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         partial void OnSelectedFormulaChanged(Type value)
@@ -234,14 +268,16 @@ namespace OptimizationSem8.ViewModels
         }
         partial void OnSelectedMethodChanged(Type value)
         {
+            FullScanVisibility = Visibility.Collapsed;
             if (typeof(BoxComplexMethod) == value)
-            {
+            {                
                 var limitationVievModel = new BoxLimitationsViewModel();
                 MethodLimitations = new BoxLimitationsPage(limitationVievModel);
                 selectedMethodLimitationVievModel = limitationVievModel;
             }
             else if (typeof(FullSearchMethod) == value)
             {
+                FullScanVisibility=Visibility.Visible;
                 var limitationVievModel = new FullSearchLimitationsViewModel();
                 MethodLimitations = new FullSearchLimitationsPage(limitationVievModel);
                 selectedMethodLimitationVievModel = limitationVievModel;

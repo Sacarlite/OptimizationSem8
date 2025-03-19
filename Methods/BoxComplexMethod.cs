@@ -3,14 +3,13 @@ using System.Linq;
 using Models.Interface;
 using Models;
 using NLog;
-using System.Collections.Generic;
 
 namespace Methods
 {
     /// <summary>
     /// Класс, реализующий комплекс-метод Бокса для оптимизации.
     /// </summary>
-    public class BoxComplexMethod:MethodModel
+    public class BoxComplexMethod : MethodModel
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly ITask task;
@@ -20,9 +19,10 @@ namespace Methods
         private readonly int precision;   // Погрешность округления (количество знаков после запятой)
         private readonly Random random;
         private readonly bool findMaximum; // Если true - ищем максимум, если false - минимум
+        private readonly bool iterationMode; // Режим итераций (true - ограничение по количеству итераций)
+        private readonly int iterationCount; // Максимальное количество итераций, если iterationMode = true
 
-        
-        public BoxComplexMethod(ITask task, bool findMaximum = false, int complexSize = 5, double epsilon = 0.1, int precision = 2)
+        public BoxComplexMethod((bool iterationMode, int iterationCount) iterations, ITask task, bool findMaximum = false, int complexSize = 6, double epsilon = 0.1, int precision = 2)
         {
             this.task = task ?? throw new ArgumentNullException(nameof(task));
             this.complexSize = complexSize >= n + 1 ? complexSize : n + 1;
@@ -30,17 +30,20 @@ namespace Methods
             this.precision = precision;
             this.random = new Random();
             this.findMaximum = findMaximum;
+            this.iterationMode = iterations.iterationMode;
+            this.iterationCount = iterations.iterationCount;
 
-            Logger.Info($"Инициализация BoxComplexMethod: findMaximum={findMaximum}, complexSize={complexSize}, epsilon={epsilon}, precision={precision}");
+            Logger.Info($"Инициализация BoxComplexMethod: findMaximum={findMaximum}, complexSize={complexSize}, epsilon={epsilon}, precision={precision}, iterationMode={iterationMode}, iterationCount={iterationCount}");
             Logger.Debug($"Объект задачи: {task.GetType().Name}");
             Logger.Debug($"Размерность: n={n}");
         }
+
         public BoxComplexMethod()
         {
             MethodName = "Комплексный метод Бокса";
-
         }
-        /// <summary>
+
+      /// <summary>
         /// Выполняет оптимизацию методом Бокса.
         /// </summary>
         /// <returns>Оптимальные параметры в виде объекта FuncPoint с округлением до заданной погрешности.</returns>
@@ -56,39 +59,48 @@ namespace Methods
             FuncPoint[] complex = CreateInitialComplex(lowerBounds, upperBounds);
 
             // Основной цикл метода Бокса
-            int iterationLimit = 1000; // Ограничение на количество итераций для предотвращения зацикливания
+            int iterationLimit = iterationMode ? iterationCount : 10000; // Ограничение на количество итераций
             int iterations = 0;
 
             while (true)
             {
                 Logger.Debug($"Итерация {iterations + 1}/{iterationLimit}");
+
+                // Вычисление значений целевой функции для всех точек комплекса
+                for (int i = 0; i < complex.Length; i++)
+                {
+                    complex[i].FuncNum = task.CalculateObjectiveFunction(complex[i]);
+                }
+
                 Logger.Debug("Поиск индексов лучшей и худшей точек");
                 (int bestIndex, int worstIndex) = FindBestAndWorstIndices(complex);
 
                 Logger.Debug("Вычисление центра комплекса");
                 double[] center = CalculateCenter(complex, worstIndex);
 
-                Logger.Debug("Проверка сходимости");
-                if (IsConverged(complex, center, bestIndex, worstIndex))
+                // Проверка сходимости (если iterationMode = false)
+                if (!iterationMode && IsConverged(complex, center, bestIndex, worstIndex))
                 {
                     Logger.Info($"Сходимость достигнута на итерации {iterations + 1} с погрешностью {epsilon}");
                     break;
                 }
 
+                // Если достигнуто максимальное количество итераций
+                if (iterations >= iterationLimit)
+                {
+                    Logger.Info($"Достигнуто максимальное количество итераций: {iterationLimit}");
+                    break;
+                }
+
                 Logger.Debug("Генерация новой точки");
                 FuncPoint newPoint = GenerateNewPoint(center, complex[worstIndex]);
+
                 Logger.Debug("Корректировка новой точки для соответствия ограничениям");
                 AdjustPointForConstraints(ref newPoint, lowerBounds, upperBounds, center, complex[bestIndex], complex[worstIndex].FuncNum);
 
                 Logger.Debug($"Замена худшей точки (индекс {worstIndex}) на новую: First={newPoint.First}, Second={newPoint.Second}, FuncNum={newPoint.FuncNum}");
                 complex[worstIndex] = newPoint;
                 iterations++;
-            }
-
-            if (iterations >= iterationLimit)
-            {
-                Logger.Error($"Метод не сошелся за {iterationLimit} итераций.");
-                throw new Exception("Метод не сошелся в пределах заданного количества итераций.");
             }
 
             // Возвращаем лучшую точку с округлением
@@ -98,6 +110,7 @@ namespace Methods
                 Math.Round(complex[finalBestIndex].First, precision),
                 Math.Round(complex[finalBestIndex].Second, precision)
             );
+
             // Округляем значение функции с учётом precision
             double rawFuncValue = task.CalculateObjectiveFunction(result);
             result.FuncNum = Math.Round(rawFuncValue, precision);
@@ -113,11 +126,13 @@ namespace Methods
         /// Создаёт начальный комплекс точек.
         /// </summary>
         private FuncPoint[] CreateInitialComplex(
-            (double FirstLower, double SecondLower) lowerBounds,
-            (double FirstUpper, double SecondUpper) upperBounds)
+     (double FirstLower, double SecondLower) lowerBounds,
+     (double FirstUpper, double SecondUpper) upperBounds)
         {
             FuncPoint[] complex = new FuncPoint[complexSize];
             Logger.Debug($"Создание комплекса из {complexSize} точек");
+
+            int P = 0; // Количество точек, удовлетворяющих ограничениям
 
             for (int j = 0; j < complexSize; j++)
             {
@@ -136,7 +151,7 @@ namespace Methods
 
                     point = new FuncPoint(first, second);
                     double rawFuncValue = task.CalculateObjectiveFunction(point);
-                    point.FuncNum = Math.Round(rawFuncValue, precision); // Округление значения функции
+                    point.FuncNum = Math.Round(rawFuncValue, precision);
                     Logger.Debug($"Значение функции (до округления): FuncNum={rawFuncValue}");
                     Logger.Debug($"Значение функции (после округления): FuncNum={point.FuncNum}");
 
@@ -148,8 +163,43 @@ namespace Methods
                     {
                         complex[j] = point;
                         validPoint = true;
+                        P++;
                         Logger.Debug($"Точка {j + 1} создана: First={point.First}, Second={point.Second}, FuncNum={point.FuncNum}");
                     }
+                    else if (P > 0)
+                    {
+                        // Смещение точки к центру уже зафиксированных точек
+                        int maxShiftAttempts = 10000; // Максимальное количество попыток смещения
+                        int shiftAttempts = 0;
+
+                        while (!validPoint && shiftAttempts < maxShiftAttempts)
+                        {
+                            Logger.Debug($"Попытка смещения {shiftAttempts + 1}/{maxShiftAttempts}");
+                            double[] center = CalculateCenter(complex.Take(P).ToArray(), -1);
+                            point.First = (point.First + center[0]) / 2;
+                            point.Second = (point.Second + center[1]) / 2;
+
+                            // Повторная проверка ограничений
+                            firstOrderValid = task.CheckFirstOrderConstraints(point);
+                            secondOrderValid = task.CheckSecondOrderConstraints(point);
+
+                            if (firstOrderValid && secondOrderValid)
+                            {
+                                complex[j] = point;
+                                validPoint = true;
+                                P++;
+                                Logger.Debug($"Точка {j + 1} создана после смещения: First={point.First}, Second={point.Second}, FuncNum={point.FuncNum}");
+                            }
+
+                            shiftAttempts++;
+                        }
+
+                        if (!validPoint)
+                        {
+                            Logger.Warn($"Не удалось сместить точку {j + 1} после {maxShiftAttempts} попыток.");
+                        }
+                    }
+
                     attempts++;
                 }
 
@@ -193,25 +243,28 @@ namespace Methods
         /// <summary>
         /// Вычисляет центр комплекса, исключая худшую точку.
         /// </summary>
-        private double[] CalculateCenter(FuncPoint[] complex, int worstIndex)
+        private double[] CalculateCenter(FuncPoint[] complex, int excludeIndex)
         {
-            Logger.Debug($"Вычисление центра комплекса, исключая худшую точку (индекс {worstIndex})");
-            double[] center = new double[n];
-            for (int i = 0; i < n; i++)
+            Logger.Debug($"Вычисление центра комплекса, исключая точку с индексом {excludeIndex}");
+            double[] center = new double[2];
+            int count = 0;
+
+            for (int i = 0; i < complex.Length; i++)
             {
-                double sum = 0;
-                int count = 0;
-                for (int j = 0; j < complexSize; j++)
+                if (i != excludeIndex && complex[i] != null)
                 {
-                    if (j != worstIndex)
-                    {
-                        sum += i == 0 ? complex[j].First : complex[j].Second;
-                        count++;
-                    }
+                    center[0] += complex[i].First;
+                    center[1] += complex[i].Second;
+                    count++;
                 }
-                center[i] = sum / count;
-                Logger.Debug($"Центр по оси {i}: {center[i]} (сумма={sum}, количество точек={count})");
             }
+
+            if (count > 0)
+            {
+                center[0] /= count;
+                center[1] /= count;
+            }
+
             Logger.Debug($"Центр комплекса: First={center[0]}, Second={center[1]}");
             return center;
         }
@@ -254,9 +307,6 @@ namespace Methods
             Logger.Debug($"Значение функции (до округления): FuncNum={rawFuncValue}");
             Logger.Debug($"Новая точка (после округления): First={newPoint.First}, Second={newPoint.Second}, FuncNum={newPoint.FuncNum}");
             return newPoint;
-            // Проверка на близость к нулю
-            if (Math.Abs(first) < 1e-10) first = 0;
-            if (Math.Abs(second) < 1e-10) second = 0;
         }
 
         /// <summary>
@@ -298,9 +348,6 @@ namespace Methods
                     Logger.Debug($"Second ({point.Second}) > {upperBounds.SecondUpper}. Установка Second={upperBounds.SecondUpper}");
                     point.Second = upperBounds.SecondUpper;
                 }
-                // Проверка на близость к нулю
-                if (Math.Abs(point.First) < 1e-10) point.First = 0;
-                if (Math.Abs(point.Second) < 1e-10) point.Second = 0;
                 double rawFuncValue = task.CalculateObjectiveFunction(point);
                 point.FuncNum = Math.Round(rawFuncValue, precision); // Округление после корректировки
                 Logger.Debug($"Значение функции (до округления): FuncNum={rawFuncValue}");
@@ -309,7 +356,7 @@ namespace Methods
 
             // Корректировка ограничений второго рода
             int secondOrderAttempts = 0;
-            const int maxSecondOrderAttempts = 100;
+            const int maxSecondOrderAttempts = 10000;
             bool secondOrderValid = task.CheckSecondOrderConstraints(point);
             Logger.Debug($"Проверка ограничений второго рода: {secondOrderValid}");
             while (!secondOrderValid && secondOrderAttempts < maxSecondOrderAttempts)
