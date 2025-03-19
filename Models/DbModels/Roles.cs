@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OptimizationSem8.Models.Interface
+namespace Models.DbModels
 {
-    internal interface ITask
+    public enum Role
     {
+        User,
+        Admin
     }
 }
