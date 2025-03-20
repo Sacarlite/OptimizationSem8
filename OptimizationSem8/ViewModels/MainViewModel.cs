@@ -255,14 +255,16 @@ namespace OptimizationSem8.ViewModels
                     if (SelectedMethod == typeof(BoxComplexMethod))
                     {
                         var boxComplexMethod = new BoxComplexMethod(limitations.Item1, optTask.task, optTask.extrType, epsilon: limitations.epsilon, precision: limitations.precision);
-                        ExtraNum = boxComplexMethod.Optimize();
-                        ExtraNum.FuncNum *= optTask.tau;
+                        var point = boxComplexMethod.Optimize();
+                        point.FuncNum *= optTask.tau;
+                        ExtraNum = point;
                     }
                     else if (SelectedMethod == typeof(FullSearchMethod))
                     {
                         var fullSearchMethod = new FullSearchMethod(limitations.Item1, optTask.task, maximize: optTask.extrType, step: limitations.epsilon, precision: limitations.precision);
-                        ExtraNum = fullSearchMethod.Optimize();
-                        ExtraNum.FuncNum *= optTask.tau;
+                        var point = fullSearchMethod.Optimize();
+                        point.FuncNum *= optTask.tau;
+                        ExtraNum = point;
                     }
                 }
                 else
