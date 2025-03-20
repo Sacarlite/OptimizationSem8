@@ -17,24 +17,5 @@ namespace OptimizationSem8.DbConnector
             optionsBuilder.UseSqlite("Data Source=Users.db");
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Username = "admin",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                    Role = Role.Admin
-                },
-                new User
-                {
-                    Id = 2,
-                    Username = "user",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("user123"),
-                    Role = Role.User // Обычный пользователь
-                }
-            );
-        }
     }
 }

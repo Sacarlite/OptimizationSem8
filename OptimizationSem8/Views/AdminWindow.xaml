@@ -74,7 +74,6 @@
                 Width="180" />
                         </StackPanel>
 
-                        <!-- PopupBox в первой строке, но поверх всех элементов -->
                         <materialDesign:PopupBox Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Top"
                              StaysOpen="True" Margin="5">
                             <materialDesign:PopupBox.ToggleContent>

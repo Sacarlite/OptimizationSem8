@@ -1,0 +1,15 @@
+Формула задачи: S = α*G*( (T2- β* A)^N +  µ *exp(T1+T2) ^N +∆ *( T2- T1))
+
+Параметры:
+Alpha: 1
+Beta: 1
+Mu: 1
+Delta: 1
+G: 1
+A: 1
+N: 2
+MinDiff: 1
+FirstLowerBound: -1
+FirstUpperBound: 1
+SecondLowerBound: -1
+SecondUpperBound: 1

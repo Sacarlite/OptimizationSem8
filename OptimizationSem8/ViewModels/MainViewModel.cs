@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Methods;
 using Models;
+using Models.DbModels;
+using OptimizationSem8.DbConnector;
 using OptimizationSem8.Enums;
 using OptimizationSem8.Service;
 using OptimizationSem8.ViewModels.PagesVievModels;
@@ -15,6 +17,8 @@ namespace OptimizationSem8.ViewModels
 {
     public partial class MainViewModel : ObservableObject
     {
+        private readonly AppDbContext _context;
+
         [ObservableProperty]
         private Dictionary<string, Type> _formulas = new Dictionary<string, Type>
             {
@@ -48,12 +52,17 @@ namespace OptimizationSem8.ViewModels
 
         [ObservableProperty]
         private FuncPoint extraNum;
+        
+        [ObservableProperty]
+        private User _currentUser;
 
         private object selectedTaskVievModel;
 
         private ILimitations selectedMethodLimitationVievModel;
-        public MainViewModel()
+        public MainViewModel(User user)
         {
+            _currentUser = user;
+            _context = new AppDbContext();
         }
 
         [RelayCommand]
@@ -121,7 +130,7 @@ namespace OptimizationSem8.ViewModels
             {
 
                 string filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
-                string filePath = FileProvider.GetFilePath(FileMode.Save, filter, $"Parameters_{DateTime.Now:yyyyMMdd_HHmmss}", "Сохранить параметры в TXT");
+                string filePath = FileProvider.GetFilePath(FileMode.Save, filter, $"Results{DateTime.Now:yyyyMMdd_HHmmss}", "Сохранить параметры в TXT");
 
                 if (!string.IsNullOrEmpty(filePath))
                 {
@@ -219,6 +228,20 @@ namespace OptimizationSem8.ViewModels
                 MessageBox.Show($"Ошибка при загрузке параметров из текстового файла: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        [RelayCommand]
+        private void ChangePassword()
+        {
+            var changePasswordWindow = new ChangePasswordWindow();
+            if (changePasswordWindow.ShowDialog() == true)
+            {
+                var user = _context.Users.Where(user => user.Id == CurrentUser.Id).FirstOrDefault();
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordWindow.NewPassword);
+                _context.SaveChanges();
+                MessageBox.Show("Пароль успешно изменен.", "Изменение пароля", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
         [RelayCommand]
         void Calc()
         {

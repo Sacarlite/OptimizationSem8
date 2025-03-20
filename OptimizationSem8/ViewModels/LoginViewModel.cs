@@ -29,7 +29,7 @@ namespace OptimizationSem8.ViewModels
             {
                 if (user.Role == Role.User)
                 {
-                    var mainWindow = new MainWindow(new MainViewModel());
+                    var mainWindow = new MainWindow(new MainViewModel(user));
                     mainWindow.IsWindowClosing += IsWindowClosing;
                     mainWindow.Show();
                 }

@@ -56,7 +56,7 @@ namespace OptimizationSem8.ViewModels
         public AdminViewModel(User currentAdmin)
         {
             _context = new AppDbContext();
-            CurrentAdmin = currentAdmin; // Устанавливаем текущего администратора
+            CurrentAdmin = currentAdmin;
             LoadUsers();
             InitializeFormulas();
             InitializeMethods();
@@ -101,7 +101,6 @@ namespace OptimizationSem8.ViewModels
         {
             if (SelectedUser != null)
             {
-                // Генерируем случайный пароль
                 var newPassword = GenerationService.GenerateRandomPassword();
                 SelectedUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
                 _context.SaveChanges();
@@ -123,14 +122,12 @@ namespace OptimizationSem8.ViewModels
         {
             if (SelectedUser != null)
             {
-                // Проверяем, не пытается ли администратор удалить самого себя
                 if (SelectedUser.Id == CurrentAdmin.Id)
                 {
                     MessageBox.Show("Вы не можете удалить самого себя.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                // Удаляем пользователя
                 _context.Users.Remove(SelectedUser);
                 _context.SaveChanges();
                 LoadUsers();
@@ -174,10 +171,8 @@ namespace OptimizationSem8.ViewModels
             var changePasswordWindow = new ChangePasswordWindow();
             if (changePasswordWindow.ShowDialog() == true)
             {
-
-
-                // Обновляем пароль администратора
-                CurrentAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordWindow.NewPassword);
+                var user = _context.Users.Where(user => user.Id== CurrentAdmin.Id).FirstOrDefault();
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordWindow.NewPassword);
                 _context.SaveChanges();
                 MessageBox.Show("Пароль успешно изменен.", "Изменение пароля", MessageBoxButton.OK, MessageBoxImage.Information);
             }
