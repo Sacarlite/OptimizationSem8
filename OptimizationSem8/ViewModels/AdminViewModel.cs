@@ -152,6 +152,15 @@ namespace OptimizationSem8.ViewModels
                 var newUser = addUserDialog.NewUser;
                 if (newUser != null)
                 {
+                    // Проверка на уникальность логина
+                    bool isUsernameUnique = !_context.Users.Any(u => u.Username == newUser.Username);
+
+                    if (!isUsernameUnique)
+                    {
+                        MessageBox.Show("Пользователь с таким логином уже существует. Пожалуйста, выберите другой логин.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     // Хэшируем пароль перед сохранением
                     newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.PasswordHash);
                     _context.Users.Add(newUser);

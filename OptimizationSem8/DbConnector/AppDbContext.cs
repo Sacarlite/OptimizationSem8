@@ -16,6 +16,13 @@ namespace OptimizationSem8.DbConnector
         {
             optionsBuilder.UseSqlite("Data Source=Users.db");
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+        }
+
 
     }
 }
